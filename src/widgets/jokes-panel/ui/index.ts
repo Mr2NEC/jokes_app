@@ -1,0 +1,1 @@
+export { JokesPanel } from './JokesPanel';
