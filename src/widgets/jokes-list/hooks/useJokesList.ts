@@ -38,7 +38,7 @@ export function useJokesList() {
     loadMoreItems,
   });
 
-  const idsSet = useMemo(() => new Set(paginatedItems.map((j) => j.id)), [paginatedItems]);
+  const idsSet = useMemo(() => new Set(orderedUniqueList.map((j) => j.id)), [orderedUniqueList]);
 
   const [refreshingIds, setRefreshingIds] = useState<IJoke['id'][]>([]);
 
