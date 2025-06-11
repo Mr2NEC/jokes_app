@@ -11,13 +11,13 @@ export const LoadMoreButton = memo(
   ({ onClick, loading = false, disabled = false }: LoadMoreButtonProps) => {
     return (
       <Button
-        sx={{ minWidth: '150px' }}
+        sx={{ minWidth: '150px', bgcolor: '#666' }}
         onClick={onClick}
         disabled={disabled || !!loading}
-        variant="outlined"
+        variant="contained"
         type="button"
       >
-        {loading ? <CircularProgress size={20} /> : 'Load More'}
+        {loading ? <CircularProgress size={20} color="inherit" /> : 'Load More'}
       </Button>
     );
   },

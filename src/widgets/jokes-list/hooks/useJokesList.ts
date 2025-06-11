@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { jokesApi, useJokesStorage, type IJoke } from '@/entities/jokes';
 import { useOrderedUniqueList, usePaginatedList } from '@/shared/hooks';
@@ -40,8 +40,14 @@ export function useJokesList() {
 
   const idsSet = useMemo(() => new Set(paginatedItems.map((j) => j.id)), [paginatedItems]);
 
+  const [refreshingIds, setRefreshingIds] = useState<IJoke['id'][]>([]);
+
   const replaceWithRandom = useCallback(
     async (oldId: IJoke['id']) => {
+      if (refreshingIds.includes(oldId)) return;
+
+      setRefreshingIds((prev) => [...prev, oldId]);
+
       try {
         const uniqueJoke = await fetchUniqueItem(
           () => triggerGetRandomJoke().unwrap(),
@@ -53,9 +59,11 @@ export function useJokesList() {
         removeJoke(oldId);
       } catch (error) {
         console.error(error);
+      } finally {
+        setRefreshingIds((prev) => prev.filter((id) => id !== oldId));
       }
     },
-    [replace, triggerGetRandomJoke, idsSet, removeJoke],
+    [refreshingIds, replace, triggerGetRandomJoke, idsSet, removeJoke],
   );
 
   return {
@@ -65,6 +73,7 @@ export function useJokesList() {
     remove: removeJoke,
     isAdded: isAddedJoke,
     replace: replaceWithRandom,
+    isRefreshing: (id: IJoke['id']) => refreshingIds.includes(id),
     isLoading: isPaginatedItemsLoading || isGetTenJokesLoading || isGetRandomJokeLoading,
     hasMore,
   };

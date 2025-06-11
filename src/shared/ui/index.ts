@@ -1,1 +1,1 @@
-export { ActionIconButton } from './ActionIconButton';
+export { LoadMoreButton } from './LoadMoreButton';

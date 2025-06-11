@@ -1,10 +1,11 @@
+import { Container } from '@mui/material';
+
 import { JokesList } from '@/widgets/jokes-list';
 
 export const HomePage = () => {
   return (
-    <div>
-      <h1>HomePage</h1>
+    <Container maxWidth="xl">
       <JokesList />
-    </div>
+    </Container>
   );
 };
