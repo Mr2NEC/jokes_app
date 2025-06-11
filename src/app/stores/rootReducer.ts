@@ -2,17 +2,18 @@ import { combineReducers } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
-import { jokesApi } from '@/entities/jokes';
+import { jokesApi, jokesReducer } from '@/entities/jokes';
 
 const rootPersistConfig = {
   key: 'root',
   storage: storage,
+  whitelist: ['jokes'],
 };
 
 const rootReducer = combineReducers({
   [jokesApi.reducerPath]: jokesApi.reducer,
+  jokes: jokesReducer,
 });
 
-export type RootState = ReturnType<typeof rootReducer>;
 export const additionalMiddleware = [jokesApi.middleware];
 export default persistReducer(rootPersistConfig, rootReducer);

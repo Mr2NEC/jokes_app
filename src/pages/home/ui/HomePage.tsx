@@ -1,8 +1,10 @@
-import { useGetTenJokesQuery } from '@/entities/jokes';
+import { JokesList } from '@/widgets/jokes-list';
 
 export const HomePage = () => {
-  const { data, error, isLoading } = useGetTenJokesQuery();
-  console.log(data, error, isLoading);
-
-  return <h1>HomePage</h1>;
+  return (
+    <div>
+      <h1>HomePage</h1>
+      <JokesList />
+    </div>
+  );
 };
