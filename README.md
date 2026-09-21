@@ -1,54 +1,57 @@
-# React + TypeScript + Vite
+# Jokes App - Feature-Sliced Design in practice
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small React application for browsing and saving jokes, built as an exercise in clean frontend architecture: Feature-Sliced Design, RTK Query and composable generic hooks.
 
-Currently, two official plugins are available:
+**Live demo:** https://jokes-app-five.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- Browse jokes with automatic loading of more items as you go
+- Save favourites; they persist across page reloads
+- Replace any joke with a new random one that is guaranteed not to be on the list already
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Architecture
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+The code follows [Feature-Sliced Design](https://feature-sliced.design/), where each layer may only import from the layers below it:
+
+```
+src/
+  app/        providers, store, theme
+  pages/      page compositions
+  widgets/    self-contained UI blocks (jokes list)
+  entities/   business entities (jokes: api, model, ui, hooks)
+  shared/     reusable hooks, ui, lib, types, api
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The rule holds throughout: `widgets` import from `entities` and `shared`, while `shared` knows nothing about jokes. Every slice exposes a public API through its `index.ts`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+## Technical highlights
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-});
+**Composable generic hooks.** Instead of one large hook, the list is built from small layers, each with a single responsibility and none of them aware of the jokes domain:
+
 ```
+useUniqueMap<T>          identity storage in a Map, uniqueness by id
+useOrder<T>              order of ids only
+useOrderedUniqueList<T>  unique and ordered list, composed from the two above
+usePaginatedList<T>      visible slice plus automatic loading of more items
+useJokesList             domain logic on top
+```
+
+**Self-loading pagination with a safety limit.** `usePaginatedList` requests more data when there are not enough items to show, but caps the number of attempts. Without the cap it would loop forever once the API runs out of new items.
+
+**Unique random replacement.** The API may return a joke that is already on the list, so a small retry helper keeps requesting until it gets one that is not, with a limit on attempts. Concurrent refreshes of the same card are blocked.
+
+**RTK Query and persistence.** Endpoints are injected with cache tags and fetched lazily; saved jokes persist with `redux-persist`, with its internal actions excluded from the serializability check.
+
+## Stack
+
+React 19, TypeScript, Vite (SWC), Redux Toolkit, RTK Query, redux-persist, MUI, Emotion, ESLint, Prettier.
+
+## Getting started
+
+```bash
+npm install
+npm run dev
+```
+
+Other scripts: `npm run build`, `npm run lint`, `npm run format`.
