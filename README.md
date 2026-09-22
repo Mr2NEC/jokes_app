@@ -4,6 +4,8 @@ A small React application for browsing and saving jokes, built as an exercise in
 
 **Live demo:** https://jokes-app-five.vercel.app
 
+![Jokes App screenshot](docs/screenshot.png)
+
 ## Features
 
 - Browse jokes with automatic loading of more items as you go
@@ -49,9 +51,15 @@ React 19, TypeScript, Vite (SWC), Redux Toolkit, RTK Query, redux-persist, MUI, 
 
 ## Getting started
 
+The app reads the API address from `VITE_BASE_JOKE_URL` and falls back to the public [Official Joke API](https://official-joke-api.appspot.com/). To override it, copy `.env.example` to `.env`.
+
 ```bash
 npm install
 npm run dev
 ```
 
 Other scripts: `npm run build`, `npm run lint`, `npm run format`.
+
+## Author
+
+Vladyslav Shpylka - [LinkedIn](https://www.linkedin.com/in/vshpylka/) · [GitHub](https://github.com/Mr2NEC)
